@@ -4,6 +4,8 @@ JOB=""
 WORKERS=0
 PSES=0
 JAR=""
+ENABLETENSORBOARD="false"
+TBINPUT=""
 while true  
 do
     case "$1" in
@@ -26,7 +28,17 @@ do
             JAR="$2" 
             echo "jar path: $JAR"
             shift  
-            ;;  
+            ;;
+         -tensorboard)
+            ENABLETENSORBOARD="$2"
+            echo "eable tensorboard: $ENABLETENSORBOARD"
+            if [ "$ENABLETENSORBOARD"x == "true"x ]
+            then
+                TBINPUT="$4"
+                shift
+                shift
+            fi
+            shift  
          *)  
             shift  
          break 
@@ -43,4 +55,6 @@ yarn jar $JAR $CLIENT_MAIN_CLASS \
          --num_worker $WORKERS \
          --num_ps $PSES \
          --container_memory 1024 \
+         --enable_tensorboard $ENABLETENSORBOARD \
+         --tb_inputdir $TBINPUT \
          --jni_so "../samples/between-graph/libbridge.so" 
