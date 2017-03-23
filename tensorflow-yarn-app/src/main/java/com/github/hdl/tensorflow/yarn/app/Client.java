@@ -91,6 +91,10 @@ public class Client {
   private TFApplicationRpc appRpc = null;
 
   private String jniSoFile = "";
+
+  private boolean isEnableTensorBoard;
+  private String tensorboardEventDir = "";
+
   /**
    * @param args Command line arguments
    */
@@ -177,6 +181,10 @@ public class Client {
             "ps quantity of tensorflow");
     opts.addOption(TFApplication.OPT_TF_JNI_SO, true,
             "jni so of tensorflow");
+    opts.addOption(TFApplication.OPT_TF_ENABLE_TENSORBOARD, true,
+            "flag whether enable the tensorboard");
+    opts.addOption(TFApplication.OPT_TF_TENSORBOARD_INPUTDIR, true,
+            "the event storage dir of the tensorboard");
   }
 
   /**
@@ -217,6 +225,8 @@ public class Client {
     //tfConatinerJar = cliParser.getOptionValue(TFApplication.OPT_TF_SERVER_JAR, TFAmContainer.APPMASTER_JAR_PATH);
     workerNum = Integer.parseInt(cliParser.getOptionValue(TFApplication.OPT_TF_WORKER_NUM, "1"));
     psNum = Integer.parseInt(cliParser.getOptionValue(TFApplication.OPT_TF_PS_NUM, "0"));
+    isEnableTensorBoard = Boolean.parseBoolean(cliParser.getOptionValue(TFApplication.OPT_TF_ENABLE_TENSORBOARD, "false"));
+    tensorboardEventDir = cliParser.getOptionValue(TFApplication.OPT_TF_TENSORBOARD_INPUTDIR, "");
 
     if (amMemory < 0) {
       throw new IllegalArgumentException("Invalid memory specified for application master, exiting."

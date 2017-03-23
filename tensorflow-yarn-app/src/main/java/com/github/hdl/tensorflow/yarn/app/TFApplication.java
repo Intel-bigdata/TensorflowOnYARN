@@ -44,6 +44,9 @@ public class TFApplication {
 
     public static final String OPT_TF_JNI_SO = "jni_so";
 
+    public static final String OPT_TF_ENABLE_TENSORBOARD = "enable_tensorboard";
+    public static final String OPT_TF_TENSORBOARD_INPUTDIR = "tb_inputdir";
+
     public static String makeOption(String opt, String val) {
         return "--" + opt + " " + val;
     }
