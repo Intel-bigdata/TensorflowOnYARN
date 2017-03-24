@@ -7,13 +7,11 @@ from tensorflow.examples.tutorials.mnist import input_data
 # input flags
 tf.app.flags.DEFINE_string("ps", "", "ps hosts")
 tf.app.flags.DEFINE_string("wk", "", "worker hosts")
-tf.app.flags.DEFINE_integer("task_index", "", "task index")
 FLAGS = tf.app.flags.FLAGS
 
 ps_hosts = FLAGS.ps.split(',')
 worker_hosts = FLAGS.wk.split(',')
-task_index = FLAGS.task_index
-master = "grpc://" + worker_hosts[task_index]
+master = "grpc://" + worker_hosts[0]
 
 # start a server for a specific task
 cluster = tf.train.ClusterSpec({'ps': ps_hosts, 'worker': worker_hosts})
@@ -22,27 +20,13 @@ cluster = tf.train.ClusterSpec({'ps': ps_hosts, 'worker': worker_hosts})
 batch_size = 100
 learning_rate = 0.0005
 training_epochs = 20
-logs_path = "/tmp/between-graph/mnist/" + task_index
+logs_path = "/tmp/in-graph/mnist/0"
 
 # load mnist data set
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 
-# Between-graph replication
-with tf.device(tf.train.replica_device_setter(
-        worker_device="/job:worker/task:%d" % task_index,
-        cluster=cluster)):
-  # count the number of updates
-  global_step = tf.get_variable('global_step', [],
-                                initializer=tf.constant_initializer(0),
-                                trainable=False)
-
-  # input images
-  with tf.name_scope('input'):
-    # None -> batch size can be any size, 784 -> flattened mnist image
-    x = tf.placeholder(tf.float32, shape=[None, 784], name="x-input")
-    # target 10 output classes
-    y_ = tf.placeholder(tf.float32, shape=[None, 10], name="y-input")
-
+# In-graph replication
+with tf.device(tf.train.replica_device_setter(cluster=cluster)):
   # model parameters will change during training so we use tf.Variable
   tf.set_random_seed(1)
   with tf.name_scope("weights"):
@@ -53,6 +37,13 @@ with tf.device(tf.train.replica_device_setter(
   with tf.name_scope("biases"):
     b1 = tf.Variable(tf.zeros([100]))
     b2 = tf.Variable(tf.zeros([10]))
+
+  # input images
+  with tf.name_scope('input'):
+    # None -> batch size can be any size, 784 -> flattened mnist image
+    x = tf.placeholder(tf.float32, shape=[None, 784], name="x-input")
+    # target 10 output classes
+    y_ = tf.placeholder(tf.float32, shape=[None, 10], name="y-input")
 
   # implement model
   with tf.name_scope("softmax"):
@@ -67,11 +58,15 @@ with tf.device(tf.train.replica_device_setter(
     # this is our cost
     cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y), reduction_indices=[1]))
 
-  # specify optimizer
-  with tf.name_scope('train'):
-    # optimizer is an "operation" which we can execute in a session
-    grad_op = tf.train.GradientDescentOptimizer(learning_rate)
-    train_op = grad_op.minimize(cross_entropy)
+  train_ops = []
+  for i in range(len(worker_hosts)):
+    with tf.device("job:worker/task:%d" % i):
+      # specify optimizer
+      with tf.name_scope('train'):
+        # optimizer is an "operation" which we can execute in a session
+        grad_op = tf.train.GradientDescentOptimizer(learning_rate)
+        train_op = grad_op.minimize(cross_entropy)
+        train_ops.append(train_op)
 
   with tf.name_scope('Accuracy'):
     # accuracy
@@ -84,11 +79,15 @@ with tf.device(tf.train.replica_device_setter(
 
   # merge all summaries into a single "operation" which we can execute in a session
   summary_op = tf.summary.merge_all()
-  init_op = tf.global_variables_initializer()
   print("Variables initialized ...")
 
-  sv = tf.train.Supervisor(is_chief=(task_index == 0),
-                           global_step=global_step,
+
+  # count the number of updates
+  global_step = tf.get_variable('global_step', [],
+                                initializer=tf.constant_initializer(0),
+                                trainable=False)
+  init_op = tf.global_variables_initializer()
+  sv = tf.train.Supervisor(global_step=global_step,
                            init_op=init_op)
 
   begin_time = time.time()
@@ -107,27 +106,24 @@ with tf.device(tf.train.replica_device_setter(
 
       count = 0
       for i in range(batch_count):
-        batch_x, batch_y = mnist.train.next_batch(batch_size)
+            batch_x, batch_y = mnist.train.next_batch(batch_size)
 
-        # perform the operations we defined earlier on batch
-        _, cost, summary, step = sess.run([train_op, cross_entropy, summary_op, global_step],
-                                          feed_dict={x: batch_x, y_: batch_y})
-        writer.add_summary(summary, step)
+            # perform the operations we defined earlier on batch
+            _, cost, summary, step = sess.run([train_ops[i % len(train_ops)], cross_entropy, summary_op, global_step],
+                                              feed_dict={x: batch_x, y_: batch_y})
+            writer.add_summary(summary, step)
 
-        count += 1
-        if count % frequency == 0 or i + 1 == batch_count:
-          elapsed_time = time.time() - start_time
-          start_time = time.time()
-          print("Step: %d," % (step + 1),
-                " Epoch: %2d," % (epoch + 1),
-                " Batch: %3d of %3d," % (i + 1, batch_count),
-                " Cost: %.4f," % cost,
-                " AvgTime: %3.2fms" % float(elapsed_time * 1000 / frequency))
-          count = 0
+            count += 1
+            if count % frequency == 0 or i + 1 == batch_count:
+              elapsed_time = time.time() - start_time
+              start_time = time.time()
+              print("Step: %d," % (step + 1),
+                    " Epoch: %2d," % (epoch + 1),
+                    " Batch: %3d of %3d," % (i + 1, batch_count),
+                    " Cost: %.4f," % cost,
+                    " AvgTime: %3.2fms" % float(elapsed_time * 1000 / frequency))
+              count = 0
 
     print("Test-Accuracy: %2.2f" % sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
     print("Total Time: %3.2fs" % float(time.time() - begin_time))
     print("Final Cost: %.4f" % cost)
-
-  sv.stop()
-  print("done")

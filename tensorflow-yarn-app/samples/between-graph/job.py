@@ -32,7 +32,7 @@ def loop():
 
 def cmd(i, target):
     subprocess.call('python mnist-client.py --ps ' + FLAGS.ps + ' --wk ' + FLAGS.wk + ' --job_name="worker"' +
-                    ' --task_index=' + str(i) + ' --target=' + target, shell=True)
+                    ' --task_index=' + str(i), shell=True)
 
 
 def main(argv):
