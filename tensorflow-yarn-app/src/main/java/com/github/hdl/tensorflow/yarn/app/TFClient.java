@@ -53,6 +53,15 @@ public class TFClient {
     this.tfClientPy = tfClientPy;
   }
 
+  public void startTensorBoardClient(String tbEventDir) {
+    if (tbEventDir != "") {
+      List<String> cmd = new ArrayList<>();
+      cmd.add("tensorboard");
+      cmd.add("--logdir="+tbEventDir);
+      execCmd(cmd);
+    }
+  }
+
   public void startTensorflowClient(String clusterSpecJsonString) {
     if (clusterSpecJsonString == null || clusterSpecJsonString.equals("")) {
       return;
