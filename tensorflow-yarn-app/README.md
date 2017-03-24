@@ -18,7 +18,12 @@ TensorFlow on YARN (TOY) is a toolkit to enable Hadoop users an easy way to run 
 Note that current project is a prototype with limitation and is still under development
 
 ## Architecture
-![enter image description here](https://cloud.githubusercontent.com/assets/1171680/24279254/ad149cde-1083-11e7-8edd-b28f377864ac.PNG)
+<p align="center">
+<img src=https://cloud.githubusercontent.com/assets/1171680/24279254/ad149cde-1083-11e7-8edd-b28f377864ac.PNG>
+</p>
+<p align="center">
+Figure1. TOY Architecture
+</p>
 
 ## Features
 - [x] Launch a TensorFlow cluster with specified number of worker and PS server
