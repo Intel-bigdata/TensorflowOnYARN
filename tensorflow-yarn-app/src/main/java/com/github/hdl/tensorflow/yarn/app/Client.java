@@ -530,6 +530,17 @@ public class Client {
                   tfClient.startTensorBoardClient(tensorboardEventDir);
                 }};
               tensorBoardThread.start();
+              try {
+                Thread.sleep(3000);
+              } catch (InterruptedException e) {
+                LOG.debug("Thread sleep in monitoring loop interrupted");
+              }
+              System.out.println("Launching tensorboard ...");
+              if (tensorBoardThread.isAlive()) {
+                System.out.println("the tensorboard launched successfully on the localhost:6006");
+              } else {
+                System.out.println("the tensorboard launched failed");
+              }
             }
             tfClient.startTensorflowClient(clusterSpecJsonString);
           }
