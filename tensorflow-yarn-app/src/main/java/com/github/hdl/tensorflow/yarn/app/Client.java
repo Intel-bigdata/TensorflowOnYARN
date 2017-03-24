@@ -523,6 +523,14 @@ public class Client {
           LOG.info("cluster spec is " + clusterSpecJsonString);
           if (!isEmptyString(clusterSpecJsonString)) {
             TFClient tfClient = new TFClient(tfClientPy);
+            if (isEnableTensorBoard) {
+              Thread tensorBoardThread = new Thread(){
+                @Override
+                public void run() {
+                  tfClient.startTensorBoardClient(tensorboardEventDir);
+                }};
+              tensorBoardThread.start();
+            }
             tfClient.startTensorflowClient(clusterSpecJsonString);
           }
         }
