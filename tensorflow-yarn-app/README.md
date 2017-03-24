@@ -19,7 +19,7 @@ Note that current project is a prototype with limitation and is still under deve
 
 ## Architecture
 <p align="center">
-<img src=https://cloud.githubusercontent.com/assets/1171680/24279254/ad149cde-1083-11e7-8edd-b28f377864ac.PNG>
+<img src=https://cloud.githubusercontent.com/assets/1171680/24279553/7fe214b0-1085-11e7-902e-a331ad61ba23.PNG>
 </p>
 <p align="center">
 Figure1. TOY Architecture
