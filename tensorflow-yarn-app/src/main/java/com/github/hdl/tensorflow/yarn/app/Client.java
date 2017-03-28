@@ -530,12 +530,12 @@ public class Client {
                   tfClient.startTensorBoardClient("/tmp/mnist/1");
                 }};
               tensorBoardThread.start();
+              LOG.info("Launching tensorboard ...");
               try {
                 Thread.sleep(3000);
               } catch (InterruptedException e) {
                 LOG.debug("Thread sleep in monitoring loop interrupted");
               }
-              LOG.info("Launching tensorboard ...");
               if (tensorBoardThread.isAlive()) {
                 LOG.info("the tensorboard launched successfully on the localhost:6006");
               } else {
