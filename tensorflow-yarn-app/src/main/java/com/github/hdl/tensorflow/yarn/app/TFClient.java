@@ -21,7 +21,9 @@ package com.github.hdl.tensorflow.yarn.app;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -51,6 +53,15 @@ public class TFClient {
 
   public TFClient(String tfClientPy) {
     this.tfClientPy = tfClientPy;
+  }
+
+  public void startTensorBoardClient(String tbEventDir) {
+    if (tbEventDir != "") {
+      List<String> cmd = new ArrayList<>();
+      cmd.add("tensorboard");
+      cmd.add("--logdir="+tbEventDir);
+      execCmd(cmd);
+    }
   }
 
   public void startTensorflowClient(String clusterSpecJsonString) {
