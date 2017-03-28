@@ -527,7 +527,7 @@ public class Client {
               Thread tensorBoardThread = new Thread(){
                 @Override
                 public void run() {
-                  tfClient.startTensorBoardClient("/tmp/mnist/1");
+                  tfClient.startTensorBoardClient(tensorboardEventDir);
                 }};
               tensorBoardThread.start();
               LOG.info("Launching tensorboard ...");
