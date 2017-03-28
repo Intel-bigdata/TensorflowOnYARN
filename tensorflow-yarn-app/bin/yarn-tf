@@ -38,7 +38,8 @@ do
                 shift
                 shift
             fi
-            shift  
+            shift
+            ;;  
          *)  
             shift  
          break 

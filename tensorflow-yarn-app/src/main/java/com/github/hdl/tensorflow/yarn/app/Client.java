@@ -527,7 +527,7 @@ public class Client {
               Thread tensorBoardThread = new Thread(){
                 @Override
                 public void run() {
-                  tfClient.startTensorBoardClient(tensorboardEventDir);
+                  tfClient.startTensorBoardClient("/tmp/mnist/1");
                 }};
               tensorBoardThread.start();
               try {
@@ -535,11 +535,11 @@ public class Client {
               } catch (InterruptedException e) {
                 LOG.debug("Thread sleep in monitoring loop interrupted");
               }
-              System.out.println("Launching tensorboard ...");
+              LOG.info("Launching tensorboard ...");
               if (tensorBoardThread.isAlive()) {
-                System.out.println("the tensorboard launched successfully on the localhost:6006");
+                LOG.info("the tensorboard launched successfully on the localhost:6006");
               } else {
-                System.out.println("the tensorboard launched failed");
+                LOG.info("the tensorboard launched failed");
               }
             }
             tfClient.startTensorflowClient(clusterSpecJsonString);
