@@ -5,7 +5,7 @@ WORKERS=0
 PSES=0
 JAR=""
 ENABLETENSORBOARD="false"
-TBINPUT=""
+TBINPUT="*"
 while true  
 do
     case "$1" in
