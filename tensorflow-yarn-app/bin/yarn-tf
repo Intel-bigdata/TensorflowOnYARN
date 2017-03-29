@@ -1,33 +1,27 @@
 #!/bin/bash
 
-JOB=""
 WORKERS=0
 PSES=0
 JAR=""
-while true  
+while true
 do
     case "$1" in
-         -job)
-            JOB="$2"
-            echo "job script: $JOB"
-            shift
-            ;;  
-         -numberworkers)
+         -num_worker)
             WORKERS="$2" 
             echo "worker num: $WORKERS"
             shift  
             ;;  
-         -numberps)
+         -num_ps)
             PSES="$2" 
             echo "ps num: $PSES"
             shift  
             ;;  
          -jar)
-            JAR="$2" 
+            JAR="$2"
             echo "jar path: $JAR"
-            shift  
-            ;;  
-         *)  
+            shift
+            ;;
+         *)
             shift  
          break 
          ;;
@@ -35,12 +29,9 @@ do
 shift
 done
 
-CLIENT_MAIN_CLASS="com.github.hdl.tensorflow.yarn.app.Client"
 
-yarn jar $JAR $CLIENT_MAIN_CLASS \
-         --jar $JAR \
-         --tf_client $JOB \
+yarn jar $JAR
          --num_worker $WORKERS \
          --num_ps $PSES \
          --container_memory 1024 \
-         --jni_so "../samples/between-graph/libbridge.so" 
+         --tf_lib "../samples/between-graph/libbridge.so"

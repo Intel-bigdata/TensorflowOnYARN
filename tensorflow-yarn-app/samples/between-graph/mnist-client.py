@@ -22,7 +22,7 @@ cluster = tf.train.ClusterSpec({'ps': ps_hosts, 'worker': worker_hosts})
 batch_size = 100
 learning_rate = 0.0005
 training_epochs = 20
-logs_path = "/tmp/between-graph/mnist/" + task_index
+logs_path = "/tmp/between-graph/mnist/" + str(task_index)
 
 # load mnist data set
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)

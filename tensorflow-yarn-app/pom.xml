@@ -107,6 +107,11 @@
           <descriptorRefs>
             <descriptorRef>jar-with-dependencies</descriptorRef>
           </descriptorRefs>
+          <archive>
+            <manifest>
+              <mainClass>com.github.hdl.tensorflow.yarn.client.Client</mainClass>
+            </manifest>
+          </archive>
         </configuration>
         <executions>
           <execution>

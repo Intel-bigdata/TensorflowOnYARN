@@ -28,11 +28,12 @@ import java.util.List;
 import java.util.Map;
 
 public class TFServer {
+  public static final String TF_LIB = "bridge";
   public ServerDef serverDef;
   private long nativeServer;
 
   static {
-    System.loadLibrary("bridge"); // Load native library at runtime
+    System.loadLibrary(TF_LIB); // Load native library at runtime
   }
 
   public static ServerDef makeServerDef(ServerDef serverDef, String jobName,
