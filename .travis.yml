@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+# Based on https://github.com/node-tensorflow/node-tensorflow/blob/master/.travis.yml
 language: java
 
 os:
@@ -26,27 +27,27 @@ jdk:
 python:
   - '2.7'
 
-sudo: false
+dist: trusty
 
 addons:
   apt:
     sources:
-      - ubuntu-toolchain-r-test
+      - sourceline: "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8"
+        key_url: "https://storage.googleapis.com/bazel-apt/doc/apt-key.pub.gpg"
     packages:
-      - wget
       - oracle-java8-installer
-      - g++-4.8
+      - bazel
 
-install:
-  # BAZEL
-  # Based on https://github.com/korfuri/bazel-travis
-  - wget 'https://github.com/bazelbuild/bazel/releases/download/0.4.5/bazel-0.4.5-installer-linux-x86_64.sh'
-  - chmod +x bazel-0.4.5-installer-linux-x86_64.sh
-  - ./bazel-0.4.5-installer-linux-x86_64.sh --user
-  - cat ~/.bazelrc >> .bazelrc
+before_script:
+  pip install numpy
 
 script:
-  travis_retry /bin/bash ./build.sh 1
+  if [[ $TRAVIS_PULL_REQUEST != "false" || $TRAVIS_REPO_SLUG != "apache/incubator-gearpump" ]];
+    then mvn install;
+  elif [[ $TRAVIS_BRANCH == "master" || $TRAVIS_TAG != "" ]];
+    then ./build.sh 1;
+  fi
+
 cache:
   directories:
     - $HOME/.m2/repository
