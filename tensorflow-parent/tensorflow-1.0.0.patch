@@ -1,17 +1,34 @@
 diff --git a/tensorflow/core/distributed_runtime/rpc/BUILD b/tensorflow/core/distributed_runtime/rpc/BUILD
-index 13e357c..4ef9f48 100644
+index 8ab8712..4ef9f48 100644
 --- a/tensorflow/core/distributed_runtime/rpc/BUILD
 +++ b/tensorflow/core/distributed_runtime/rpc/BUILD
-@@ -289,7 +289,7 @@ cc_library(
-     ],
+@@ -280,7 +280,16 @@ cc_library(
+     alwayslink = 1,
  )
  
 -cc_binary(
 +cc_library(
++    name = "grpc_runtime",
++    visibility = ["//visibility:public"],
++    deps = [
++        ":grpc_server_lib",
++        ":grpc_session",
++    ],
++)
++
++cc_library(
      name = "grpc_tensorflow_server",
      srcs = [
          "grpc_tensorflow_server.cc",
-@@ -462,3 +462,35 @@ tf_cuda_cc_test(
+@@ -293,6 +302,7 @@ cc_binary(
+         "//tensorflow/core:lib",
+         "//tensorflow/core:protos_all_cc",
+         "//tensorflow/core/distributed_runtime:server_lib",
++        "//tensorflow/core/kernels:data_flow",
+         "@grpc//:grpc++_unsecure",
+     ],
+ )
+@@ -452,3 +462,35 @@ tf_cuda_cc_test(
          "//tensorflow/core/kernels:variable_ops",
      ],
  )
