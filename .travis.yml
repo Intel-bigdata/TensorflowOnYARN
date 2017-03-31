@@ -37,7 +37,7 @@ addons:
       - oracle-java8-installer
       - g++-4.8
 
-before_install:
+install:
   # BAZEL
   # Based on https://github.com/korfuri/bazel-travis
   - wget 'https://github.com/bazelbuild/bazel/releases/download/0.4.5/bazel-0.4.5-installer-linux-x86_64.sh'
@@ -45,7 +45,7 @@ before_install:
   - ./bazel-0.4.5-installer-linux-x86_64.sh --user
   - cat ~/.bazelrc >> .bazelrc
 
-install:
+script:
   travis_retry /bin/bash ./build.sh 1
 cache:
   directories:
