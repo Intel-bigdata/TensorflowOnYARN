@@ -42,7 +42,7 @@ before_script:
   pip install numpy
 
 script:
-  if [[ $TRAVIS_PULL_REQUEST != "false" || $TRAVIS_REPO_SLUG != "apache/incubator-gearpump" ]];
+  if [[ $TRAVIS_PULL_REQUEST != "false" || $TRAVIS_REPO_SLUG != "Intel-bigdata/TensorFlowOnYARN" ]];
     then cd tensorflow-parent && mvn install;
   elif [[ $TRAVIS_BRANCH == "master" || $TRAVIS_TAG != "" ]];
     then ./build.sh 1;
