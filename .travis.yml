@@ -43,7 +43,7 @@ before_script:
 
 script:
   if [[ $TRAVIS_PULL_REQUEST != "false" || $TRAVIS_REPO_SLUG != "apache/incubator-gearpump" ]];
-    then mvn install;
+    then cd tensorflow-parent && mvn install;
   elif [[ $TRAVIS_BRANCH == "master" || $TRAVIS_TAG != "" ]];
     then ./build.sh 1;
   fi
