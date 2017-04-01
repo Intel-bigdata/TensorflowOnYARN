@@ -27,6 +27,7 @@
   <modules>
     <module>tensorflow-bridge</module>
     <module>tensorflow-yarn-app</module>
+    <module>tensorflow-yarn-dist</module>
   </modules>
 
   <properties>
