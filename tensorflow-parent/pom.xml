@@ -26,6 +26,7 @@
 
   <modules>
     <module>tensorflow-bridge</module>
+    <module>tensorflow-native</module>
     <module>tensorflow-yarn-app</module>
     <module>tensorflow-yarn-dist</module>
   </modules>
@@ -59,9 +60,9 @@
           <version>3.0.0</version>
         </plugin>
         <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>native-maven-plugin</artifactId>
-          <version>1.0-alpha-8</version>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>1.8</version>
         </plugin>
       </plugins>
     </pluginManagement>

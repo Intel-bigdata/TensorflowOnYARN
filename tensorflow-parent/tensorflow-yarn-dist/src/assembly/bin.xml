@@ -43,7 +43,7 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>../tensorflow/bazel-bin/tensorflow/core/distributed_runtime/rpc/libbridge.so</source>
+      <source>../tensorflow-native/tensorflow/bazel-bin/tensorflow/core/distributed_runtime/rpc/libbridge.so</source>
       <outputDirectory>lib</outputDirectory>
       <fileMode>0644</fileMode>
     </file>

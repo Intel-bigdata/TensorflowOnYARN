@@ -44,8 +44,10 @@ before_script:
 script:
   if [[ $TRAVIS_PULL_REQUEST != "false" || $TRAVIS_REPO_SLUG != "Intel-bigdata/TensorFlowOnYARN" ]];
     then cd tensorflow-parent && mvn install;
-  elif [[ $TRAVIS_BRANCH == "master" || $TRAVIS_TAG != "" ]];
-    then ./build.sh 1;
+  elif [[ $TRAVIS_BRANCH == "master" ||  $TRAVIS_TAG != "" ]];
+  # temporarily disable native build which exceeds maximum time limit on travis
+  # then cd tensorflow-parent && mvn install -Pnative;
+    then cd tensorflow-parent && mvn install;
   fi
 
 cache:

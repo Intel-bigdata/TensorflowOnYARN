@@ -11,14 +11,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License. See accompanying LICENSE file.
 
-cd tensorflow-parent/tensorflow
+cd tensorflow
 
-PATCH=../tensorflow-1.0.0.patch
+PATCH=../tools/tensorflow-1.0.0.patch
 
 echo "Applying patch..."
 git apply ${PATCH}
 
-if [ "$1" -eq 1 ];
+if [ "$1" == "1" ];
   then
     echo "Running configure with default options..."
     ./configure << EOF
@@ -38,14 +38,10 @@ EOF
 fi
 
 echo "Building TensorFlow..."
-bazel build -c opt --local_resources 2048,.5,1.0 //tensorflow/core/distributed_runtime/rpc:libbridge.so
+bazel build -c opt //tensorflow/core/distributed_runtime/rpc:libbridge.so
 git apply --reverse ${PATCH}
 
 cd ..
 
-echo "Building TensorFlowOnYARN..."
-mvn install
-
-cd ..
 echo "Done"
 
