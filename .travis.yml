@@ -33,15 +33,15 @@ addons:
       - bazel
 
 before_script:
-  pip install numpy
+  - pip install numpy
+  - echo "startup --host_jvm_args=-Xmx2500m" >> .bazelrc
+  - echo "startup --host_jvm_args=-Xms2500m" >> .bazelrc
+  - echo "startup --batch" >> .bazelrc
+  - echo "build --spawn_strategy=standalone --genrule_strategy=standalone --local_resources 2048,1.0,1.0" >> .bazelrc
+  - cat .bazelrc >> ~/.bazelrc
 
 script:
-  # temporarily disable native build(-Pnative) for master and tag which exceeds maximum time limit on travis
-  if [[ $TRAVIS_PULL_REQUEST != "false" || $TRAVIS_REPO_SLUG != "Intel-bigdata/TensorFlowOnYARN" ]];
-    then cd tensorflow-parent && mvn install;
-  elif [[ $TRAVIS_BRANCH == "master" ||  $TRAVIS_TAG != "" ]];
-    then cd tensorflow-parent && mvn install;
-  fi
+  cd tensorflow-parent && mvn install -Pnative -Pdist;
 
 cache:
   directories:
