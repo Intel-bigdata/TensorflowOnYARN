@@ -18,13 +18,13 @@ import org.hdl.tensorflow.bridge.TFServer;
 public class Constants {
 
   public static final String DEFAULT_APP_NAME = "TensorFlow";
-  public static final String DEFAULT_APP_MASTER_MEMORY = "1024";
+  public static final String DEFAULT_APP_MASTER_MEMORY = "4096";
   public static final String DEFAULT_APP_MASTER_VCORES = "1";
   public static final String DEFAULT_APP_MASTER_QUEUE = "default";
-  public static final String DEFAULT_CONTAINER_MEMORY = "1024";
+  public static final String DEFAULT_CONTAINER_MEMORY = "4096";
   public static final String DEFAULT_CONTAINER_VCORES = "1";
-  public static final String DEFAULT_TF_WORKER_NUM = "1";
-  public static final String DEFAULT_TF_PS_NUM = "0";
+  public static final String DEFAULT_TF_WORKER_NUM = "2";
+  public static final String DEFAULT_TF_PS_NUM = "1";
 
   public static final String OPT_TF_APP_NAME = "app_name";
   public static final String OPT_TF_APP_MASTER_MEMORY = "am_memory";

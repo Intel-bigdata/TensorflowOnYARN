@@ -170,7 +170,7 @@ public class Client extends ProcessRunner {
         if (spec != null) {
           ClusterSpec clusterSpec = ClusterSpec.fromJsonString(spec);
           if (isClusterSpecSatisfied(clusterSpec)) {
-            LOG.info("cluster spec is " + Utils.toJsonString(clusterSpec));
+            System.out.println("ClusterSpec: " + Utils.toJsonString(clusterSpec.getCluster()));
             return true;
           }
         }

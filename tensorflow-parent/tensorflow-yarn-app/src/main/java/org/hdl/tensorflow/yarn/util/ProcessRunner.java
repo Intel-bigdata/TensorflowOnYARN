@@ -51,7 +51,6 @@ public abstract class ProcessRunner {
     }
 
     if (success) {
-      LOG.info(name + " completed successfully");
       System.exit(0);
     } else {
       LOG.error(name + " failed to complete successfully");
