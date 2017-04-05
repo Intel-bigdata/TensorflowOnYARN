@@ -16,12 +16,12 @@ import time
 from tensorflow.examples.tutorials.mnist import input_data
 
 # input flags
-tf.app.flags.DEFINE_string("ps", "", "ps hosts")
-tf.app.flags.DEFINE_string("wk", "", "worker hosts")
+tf.app.flags.DEFINE_string("ps_hosts", "", "ps hosts")
+tf.app.flags.DEFINE_string("worker_hosts", "", "worker hosts")
 FLAGS = tf.app.flags.FLAGS
 
-ps_hosts = FLAGS.ps.split(',')
-worker_hosts = FLAGS.wk.split(',')
+ps_hosts = FLAGS.ps_hosts.split(',')
+worker_hosts = FLAGS.worker_hosts.split(',')
 master = "grpc://" + worker_hosts[0]
 
 # start a server for a specific task

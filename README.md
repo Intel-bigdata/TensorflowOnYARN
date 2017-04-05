@@ -74,13 +74,13 @@ Figure1. TOY Architecture
    
    ```bash
    python examples/between-graph/mnist-client.py \
-     --ps "ps0.hostname:ps0.port,ps1.hostname:ps1.port" \
-     --wk "worker0.hostname:worker0.port,worker1.hostname:worker1.port" \
+     --ps_hosts="ps0.hostname:ps0.port,ps1.hostname:ps1.port" \
+     --worker_hosts="worker0.hostname:worker0.port,worker1.hostname:worker1.port" \
      --task_index=0
   
    python examples/between-graph/mnist-client.py \
-     --ps "ps0.hostname:ps0.port,ps1.hostname:ps1.port" \
-     --wk "worker0.hostname:worker0.port,worker1.hostname:worker1.port" \
+     --ps_hosts="ps0.hostname:ps0.port,ps1.hostname:ps1.port" \
+     --worker_hosts="worker0.hostname:worker0.port,worker1.hostname:worker1.port" \
      --task_index=1
    ```
 
