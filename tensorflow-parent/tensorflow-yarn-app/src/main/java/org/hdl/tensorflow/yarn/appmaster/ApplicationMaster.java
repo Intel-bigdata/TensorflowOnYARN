@@ -71,6 +71,8 @@ public class ApplicationMaster extends ProcessRunner {
   private ApplicationAttemptId appAttemptId;
   private ApplicationMasterArgs args;
   private ClusterSpec clusterSpec;
+  private long containerMemory;
+  private int containerVCores;
   private AMRMClientAsync amRMClient;
   private NMClientAsync nmClientAsync;
   private NMCallbackHandler containerListener;
@@ -110,34 +112,16 @@ public class ApplicationMaster extends ProcessRunner {
   public void init(CommandLine cliParser) throws Exception {
     LOG.info("Starting ApplicationMaster");
 
+    // Args have to be initialized first
+    this.args = new ApplicationMasterArgs(cliParser);
+    this.clusterSpec = new ClusterSpec();
+
     String hostname = System.getenv(Environment.NM_HOST.name());
     int rpcPort = setupRPCService(hostname);
     RegisterApplicationMasterResponse response = setupRMConnection(hostname, rpcPort);
+    setupPreviousRunningContainers(response);
+    setupContainerResource(response);
     setupNMConnection();
-
-    String containerIdStr =
-        System.getenv(Environment.CONTAINER_ID.name());
-    ContainerId containerId = ContainerId.fromString(containerIdStr);
-    appAttemptId = containerId.getApplicationAttemptId();
-    List<Container> previousAMRunningContainers =
-        response.getContainersFromPreviousAttempts();
-    LOG.info(appAttemptId + " received " + previousAMRunningContainers.size()
-        + " previous attempts' running containers on AM registration.");
-    for (Container container : previousAMRunningContainers) {
-      launchedContainers.add(container.getId());
-    }
-    allocatedContainerNum.addAndGet(previousAMRunningContainers.size());
-
-    // Dump out information about cluster capability as seen by the
-    // resource manager
-    long maxMem = response.getMaximumResourceCapability().getMemorySize();
-    LOG.info("Max mem capability of resources in this cluster " + maxMem);
-
-    int maxVCores = response.getMaximumResourceCapability().getVirtualCores();
-    LOG.info("Max vcores capability of resources in this cluster " + maxVCores);
-
-    this.args = new ApplicationMasterArgs(cliParser, maxMem, maxVCores);
-    this.clusterSpec = new ClusterSpec();
   }
 
   /**
@@ -235,6 +219,34 @@ public class ApplicationMaster extends ProcessRunner {
     nmClientAsync.start();
   }
 
+  private void setupPreviousRunningContainers(RegisterApplicationMasterResponse response) {
+    String containerIdStr =
+        System.getenv(Environment.CONTAINER_ID.name());
+    ContainerId containerId = ContainerId.fromString(containerIdStr);
+    appAttemptId = containerId.getApplicationAttemptId();
+    List<Container> previousAMRunningContainers =
+        response.getContainersFromPreviousAttempts();
+    LOG.info(appAttemptId + " received " + previousAMRunningContainers.size()
+        + " previous attempts' running containers on AM registration.");
+    for (Container container : previousAMRunningContainers) {
+      launchedContainers.add(container.getId());
+    }
+    allocatedContainerNum.addAndGet(previousAMRunningContainers.size());
+  }
+
+  private void setupContainerResource(RegisterApplicationMasterResponse response) {
+    // Dump out information about cluster capability as seen by the
+    // resource manager
+    long maxMem = response.getMaximumResourceCapability().getMemorySize();
+    LOG.info("Max mem capability of resources in this cluster " + maxMem);
+
+    int maxVCores = response.getMaximumResourceCapability().getVirtualCores();
+    LOG.info("Max vcores capability of resources in this cluster " + maxVCores);
+
+    this.containerMemory = args.getContainerMemory(maxMem);
+    this.containerVCores = args.getContainerVCores(maxVCores);
+  }
+
   private int setupRPCService(String hostname) {
     TFApplicationRpcServer rpcServer = new TFApplicationRpcServer(hostname, new RpcForClient());
     int rpcPort = rpcServer.getRpcPort();
@@ -281,7 +293,7 @@ public class ApplicationMaster extends ProcessRunner {
 
   private void launchContainer(Container container, TFTaskInfo taskInfo) {
     LaunchContainerThread launchThread = new LaunchContainerThread(container,
-        this, taskInfo, this.clusterSpec, args.containerMemory, args.tfLib, args.tfJar);
+        this, taskInfo, this.clusterSpec, containerMemory, args.tfLib, args.tfJar);
 
     // launch and start the container on a separate thread to keep
     // the main thread unblocked
@@ -303,7 +315,7 @@ public class ApplicationMaster extends ProcessRunner {
   private ContainerRequest setupContainerAskForRM() {
     // Set up resource type requirements
     // For now, memory and CPU are supported so we set memory and cpu requirements
-    Resource capability = Resource.newInstance(args.containerMemory, args.containerVCores);
+    Resource capability = Resource.newInstance(containerMemory, containerVCores);
     Priority priority = Priority.newInstance(0);
 
     return new ContainerRequest(capability, null, null, priority);
