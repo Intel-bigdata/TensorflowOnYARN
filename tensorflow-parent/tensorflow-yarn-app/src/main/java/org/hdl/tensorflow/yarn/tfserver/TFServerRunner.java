@@ -14,6 +14,7 @@
 package org.hdl.tensorflow.yarn.tfserver;
 
 import org.hdl.tensorflow.bridge.TFServer;
+import org.hdl.tensorflow.bridge.TFServerException;
 import org.hdl.tensorflow.yarn.appmaster.ClusterSpec;
 import org.hdl.tensorflow.yarn.util.Constants;
 import org.hdl.tensorflow.yarn.util.ProcessRunner;
@@ -42,7 +43,7 @@ public class TFServerRunner extends ProcessRunner {
   }
 
   @Override
-  public Options initOptions() {
+  public Options initOptions(String[] args) {
     Options opts = new Options();
     opts.addOption(Constants.OPT_CLUSTER_SPEC, true, "TensorFlow server cluster spec");
     opts.addOption(Constants.OPT_JOB_NAME, true, "TensorFlow server job name");
@@ -59,7 +60,7 @@ public class TFServerRunner extends ProcessRunner {
   }
 
   @Override
-  public boolean run() {
+  public boolean run() throws Exception {
     String serverName = jobName + ":" + taskIndex;
     LOG.info("Launch a new TensorFlow server " + serverName);
 

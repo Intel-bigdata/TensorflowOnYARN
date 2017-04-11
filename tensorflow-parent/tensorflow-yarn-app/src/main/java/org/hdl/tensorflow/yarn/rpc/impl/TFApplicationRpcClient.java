@@ -29,33 +29,29 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 
 public class TFApplicationRpcClient implements TFApplicationRpc {
-  private String serverAddress;
-  private int serverPort;
   private RecordFactory recordFactory = RecordFactoryProvider.getRecordFactory(null);
   private TensorFlowCluster tensorflow;
+  private static TFApplicationRpcClient instance = null;
 
-  public TFApplicationRpcClient(String serverAddress, int serverPort) {
-    this.serverAddress = serverAddress;
-    this.serverPort = serverPort;
+  public static TFApplicationRpcClient getInstance(String serverAddress, int serverPort) throws IOException {
+    if (null == instance) {
+      instance = new TFApplicationRpcClient(serverAddress, serverPort);
+    }
+    return instance;
+  }
+
+  private TFApplicationRpcClient(String serverAddress, int serverPort) throws IOException {
+    InetSocketAddress address = new InetSocketAddress(serverAddress, serverPort);
+    Configuration conf = new Configuration();
+    RetryPolicy retryPolicy = RMProxy.createRetryPolicy(conf, false);
+    TensorFlowCluster proxy = RMProxy.createRMProxy(conf, TensorFlowCluster.class, address);
+    this.tensorflow = (TensorFlowCluster) RetryProxy.create(
+        TensorFlowCluster.class, proxy, retryPolicy);
   }
 
   public String getClusterSpec() throws IOException, YarnException {
     GetClusterSpecResponse response =
         this.tensorflow.getClusterSpec(recordFactory.newRecordInstance(GetClusterSpecRequest.class));
     return response.getClusterSpec();
-  }
-
-  public TFApplicationRpc getRpc() {
-    InetSocketAddress address = new InetSocketAddress(serverAddress, serverPort);
-    Configuration conf = new Configuration();
-    RetryPolicy retryPolicy = RMProxy.createRetryPolicy(conf, false);
-    try {
-      TensorFlowCluster proxy = RMProxy.createRMProxy(conf, TensorFlowCluster.class, address);
-      this.tensorflow = (TensorFlowCluster) RetryProxy.create(
-          TensorFlowCluster.class, proxy, retryPolicy);
-      return this;
-    } catch (IOException e) {
-      return null;
-    }
   }
 }

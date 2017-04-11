@@ -102,7 +102,7 @@ public class ApplicationMaster extends ProcessRunner {
   }
 
   @Override
-  public Options initOptions() {
+  public Options initOptions(String[] args) {
     Options options = new Options();
     Utils.addAppMasterOptions(options);
     return options;
@@ -114,7 +114,7 @@ public class ApplicationMaster extends ProcessRunner {
 
     // Args have to be initialized first
     this.args = new ApplicationMasterArgs(cliParser);
-    this.clusterSpec = new ClusterSpec();
+    this.clusterSpec = ClusterSpec.empty();
 
     String hostname = System.getenv(Environment.NM_HOST.name());
     int rpcPort = setupRPCService(hostname);

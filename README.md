@@ -67,11 +67,15 @@ Figure1. TOY Architecture
 
    ```bash
    cd tensorflow-yarn-${VERSION}
-   bin/ydl-tf --num_worker 2 --num_ps 2
+   bin/ydl-tf launch --num_worker 2 --num_ps 2
    ```
    
    This will launch a YARN application, which creates a `tf.train.Server` instance for each task.
-    A `ClusterSpec` is printed on the console such that you can submit the training script against.
+    A `ClusterSpec` is printed on the console such that you can submit the training script to. e.g.
+    
+   ```bash
+   ClusterSpec: {"ps":["node1:22257","node2:22222"],"worker":["node3:22253","node2:22255"]}
+   ```
    
    ```bash
    python examples/between-graph/mnist-client.py \
@@ -85,3 +89,8 @@ Figure1. TOY Architecture
      --task_index=1
    ```
 
+4. To get ClusterSpec of an existing TensorFlow cluster launched by a previous YARN application.
+
+   ```bash
+   bin/ydl-tf cluster --app_id <Application ID>
+   ```

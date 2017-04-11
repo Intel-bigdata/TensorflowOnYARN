@@ -36,6 +36,7 @@ public class Constants {
   public static final String OPT_TF_LIB = "tf_lib";
   public static final String OPT_TF_WORKER_NUM = "num_worker";
   public static final String OPT_TF_PS_NUM = "num_ps";
+  public static final String OPT_APPLICATION_ID = "app_id";
 
   public static final String OPT_CLUSTER_SPEC = "cluster_spec";
   public static final String OPT_TASK_INDEX = "task_index";

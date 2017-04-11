@@ -13,6 +13,7 @@
  */
 package org.hdl.tensorflow.yarn.util;
 
+import org.hdl.tensorflow.bridge.TFServerException;
 import org.hdl.tensorflow.yarn.client.Client;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
@@ -36,8 +37,8 @@ public abstract class ProcessRunner {
 
   public void run(String[] args) {
     boolean success = false;
-    Options opts = initOptions();
     LOG.info("Initializing " + name);
+    Options opts = initOptions(args);
     try {
       init(parseArgs(opts, args));
       success = run();
@@ -58,11 +59,11 @@ public abstract class ProcessRunner {
     }
   }
 
-  public abstract Options initOptions();
+  public abstract Options initOptions(String[] args);
 
   public abstract void init(CommandLine cliParser) throws Exception;
 
-  public abstract boolean run() throws Exception;
+  public abstract boolean run() throws Exception, TFServerException;
 
   private CommandLine parseArgs(Options opts, String[] args) throws ParseException {
     if (args.length == 0) {

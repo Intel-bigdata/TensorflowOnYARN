@@ -12,5 +12,4 @@
 # limitations under the License. See accompanying LICENSE file.
 
 BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
-yarn jar $BASE_DIR/lib/tensorflow-yarn-app-0.1.0-SNAPSHOT-jar-with-dependencies.jar -tf_lib \
-         $BASE_DIR/lib/libbridge.so $@
+yarn jar $BASE_DIR/lib/tensorflow-yarn-app-0.1.0-SNAPSHOT-jar-with-dependencies.jar $@

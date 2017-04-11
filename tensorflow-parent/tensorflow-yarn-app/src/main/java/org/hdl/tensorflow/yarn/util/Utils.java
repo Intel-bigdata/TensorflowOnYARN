@@ -29,6 +29,7 @@ import org.apache.hadoop.yarn.api.records.LocalResourceVisibility;
 import org.apache.hadoop.yarn.api.records.URL;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -138,4 +139,12 @@ public class Utils {
     ObjectMapper objectMapper = new ObjectMapper();
     return objectMapper.writeValueAsString(object);
   }
+
+
+  public static String getParentDir(String path) {
+    File file = new File(path);
+    return file.getParent();
+  }
+
+
 }

@@ -33,7 +33,11 @@ public class ClusterSpec {
   private static final String PS = "ps";
   private final Map<String, List<String>> cluster;
 
-  public ClusterSpec() {
+  public static ClusterSpec empty() {
+    return new ClusterSpec();
+  }
+
+  private ClusterSpec() {
     this(Maps.newHashMap());
   }
 
