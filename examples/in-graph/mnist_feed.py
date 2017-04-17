@@ -9,27 +9,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License. See accompanying LICENSE file.
-
-# This example is adapted from
-# https://github.com/tensorflow/tensorflow/blob/07bb8e/tensorflow/examples/tutorials/mnist/fully_connected_feed.py
-
-"""Trains and Evaluates the MNIST network using a feed dictionary."""
 from __future__ import print_function
 
-# pylint: disable=missing-docstring
 import argparse
 import os
 import sys
 import time
 
-from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
-
 from tensorflow.examples.tutorials.mnist import input_data
 from tensorflow.examples.tutorials.mnist import mnist
-
-# Basic model parameters as external flags.
-FLAGS = None
 
 def placeholder_inputs(batch_size):
   """Generate placeholder variables to represent the input tensors.
@@ -51,6 +40,7 @@ def placeholder_inputs(batch_size):
                                                          mnist.IMAGE_PIXELS))
   labels_placeholder = tf.placeholder(tf.int32, shape=(batch_size))
   return images_placeholder, labels_placeholder
+
 
 def fill_feed_dict(data_set, images_pl, labels_pl):
   """Fills the feed_dict for training the given step.
@@ -107,7 +97,6 @@ def do_eval(sess,
   print('  Num examples: %d  Num correct: %d  Precision @ 1: %0.04f' %
         (num_examples, true_count, precision))
 
-
 def run_training():
   """Train MNIST for a number of steps."""
   # Get the sets of images and labels for training, validation, and
@@ -123,19 +112,16 @@ def run_training():
   # start a server for a specific task
   cluster = tf.train.ClusterSpec({'ps': ps_hosts, 'worker': worker_hosts})
 
-  # Between-graph replication
-  with tf.device(tf.train.replica_device_setter(
-          worker_device="/job:worker/task:%d" % task_index,
-          cluster=cluster)):
+  # In-graph replication
+  with tf.device(tf.train.replica_device_setter(cluster=cluster)):
 
     # count the number of updates
     global_step = tf.get_variable('global_step', [],
                                   initializer=tf.constant_initializer(0),
                                   trainable=False)
 
-    # Generate placeholders for the images and labels.
     images_placeholder, labels_placeholder = placeholder_inputs(
-        FLAGS.batch_size)
+      FLAGS.batch_size)
 
     # Build a Graph that computes predictions from the inference model.
     logits = mnist.inference(images_placeholder,
@@ -145,20 +131,28 @@ def run_training():
     # Add to the Graph the Ops for loss calculation.
     loss = mnist.loss(logits, labels_placeholder)
 
-    # Add to the Graph the Ops that calculate and apply gradients.
-    train_op = mnist.training(loss, FLAGS.learning_rate)
+    train_ops = []
+    for i in range(len(worker_hosts)):
+      with tf.device("job:worker/task:%d" % i):
+        # specify optimizer
+        with tf.name_scope('train'):
+          # Generate placeholders for the images and labels.
+
+
+          # Add to the Graph the Ops that calculate and apply gradients.
+          train_op = mnist.training(loss, FLAGS.learning_rate)
+
+          train_ops.append(train_op)
 
     # Add the Op to compare the logits to the labels during evaluation.
     eval_correct = mnist.evaluation(logits, labels_placeholder)
 
-    # Build the summary Tensor based on the TF collection of Summaries.
+    # merge all summaries into a single "operation" which we can execute in a session
     summary_op = tf.summary.merge_all()
 
-    # Add the variable initializer Op.
     init_op = tf.global_variables_initializer()
 
-    sv = tf.train.Supervisor(is_chief=(task_index == 0),
-                             global_step=global_step,
+    sv = tf.train.Supervisor(global_step=global_step,
                              init_op=init_op)
 
     with sv.prepare_or_wait_for_session(master) as sess:
@@ -182,7 +176,7 @@ def run_training():
         # inspect the values of your Ops or variables, you may include them
         # in the list passed to sess.run() and the value tensors will be
         # returned in the tuple from the call.
-        _, loss_value, summary  = sess.run([train_op, loss, summary_op],
+        _, loss_value, summary  = sess.run([train_ops[step % len(train_ops)], loss, summary_op],
                                  feed_dict=feed_dict)
 
         duration = time.time() - start_time
@@ -219,7 +213,6 @@ def run_training():
                   labels_placeholder,
                   data_sets.test)
 
-
 def main(_):
   run_training()
 
@@ -237,12 +230,6 @@ if __name__ == '__main__':
       type=str,
       default="",
       help='Worker hosts'
-  )
-  parser.add_argument(
-      '--task_index',
-      type=int,
-      default=0,
-      help='Task index'
   )
   parser.add_argument(
       '--learning_rate',

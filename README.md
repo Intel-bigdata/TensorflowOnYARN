@@ -46,13 +46,13 @@ Figure1. TOY Architecture
 
 0. Prepare the build environment following the instructions from https://www.tensorflow.org/install/install_sources
 
-1. Clone the TensorFlowOnYARN repository
+1. Clone the TensorFlowOnYARN repository.
    
    ```bash
    git clone --recursive https://github.com/Intel-bigdata/TensorFlowOnYARN
    ```
 
-2. Build the assembly
+2. Build the assembly.
 
    ```bash
    cd TensorFlowOnYARN/tensorflow-parent
@@ -63,7 +63,7 @@ Figure1. TOY Architecture
    in the `tensorflow-parent/tensorflow-yarn-dist/target` directory. Distribute the assembly
    to the client node of a YARN cluster and extract.
    
-3. Run the [between-graph mnist example](examples/between-graph/mnist_feed.py)
+3. Run the [between-graph mnist example](examples/between-graph/mnist_feed.py).
 
    ```bash
    cd tensorflow-yarn-${VERSION}
@@ -94,3 +94,19 @@ Figure1. TOY Architecture
    ```bash
    bin/ydl-tf cluster --app_id <Application ID>
    ```
+
+5. You may also use YARN commands through `ydl-tf`. 
+
+   For example, to get running application list,
+
+   ```bash
+   bin/ydl-tf application --list
+   ```
+
+   or to kill an existing YARN application(TensorFlow cluster),
+
+   ```bash
+   bin/ydl-tf kill --application <Application ID>
+   ```
+
+

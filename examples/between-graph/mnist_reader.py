@@ -9,6 +9,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License. See accompanying LICENSE file.
+
+# This example is adapted from
+# https://github.com/tensorflow/tensorflow/blob/07bb8e/tensorflow/examples/how_tos/reading_data/fully_connected_reader.py
+
+"""Train and Eval the MNIST network.
+This version is like fully_connected_feed.py but uses data converted
+to a TFRecords file containing tf.train.Example protocol buffers.
+See tensorflow/g3doc/how_tos/reading_data.md#reading-from-files
+for context.
+YOU MUST run convert_to_records before running this (but you only need to
+run it once).
+"""
 from __future__ import print_function
 
 import argparse
@@ -18,6 +30,7 @@ import tensorflow as tf
 import time
 from tensorflow.examples.tutorials.mnist import mnist
 
+# Basic model parameters as external flags.
 FLAGS = None
 
 # Constants used for dealing with the files, matches convert_to_records.
@@ -79,7 +92,7 @@ def run_training():
   worker_hosts = FLAGS.worker_hosts.split(',')
   task_index = FLAGS.task_index
   master = "grpc://" + worker_hosts[task_index]
-  logs_path = FLAGS.log_dir + str(task_index)
+  logs_path = os.path.join(FLAGS.log_dir, str(task_index))
 
   # start a server for a specific task
   cluster = tf.train.ClusterSpec({'ps': ps_hosts, 'worker': worker_hosts})
@@ -88,6 +101,7 @@ def run_training():
   with tf.device(tf.train.replica_device_setter(
           worker_device="/job:worker/task:%d" % task_index,
           cluster=cluster)):
+
     # count the number of updates
     global_step = tf.get_variable('global_step', [],
                                   initializer=tf.constant_initializer(0),
@@ -107,13 +121,12 @@ def run_training():
     # Add to the Graph operations that train the model.
     train_op = mnist.training(loss, FLAGS.learning_rate)
 
-    # The op for initializing the variables.
-    init_op = tf.group(tf.global_variables_initializer(),
-                       tf.local_variables_initializer())
-
     # merge all summaries into a single "operation" which we can execute in a session
     summary_op = tf.summary.merge_all()
-    print("Variables initialized ...")
+
+    # Add the variable initializer Op.
+    init_op = tf.group(tf.global_variables_initializer(),
+                       tf.local_variables_initializer())
 
     sv = tf.train.Supervisor(is_chief=(task_index == 0),
                              global_step=global_step,
@@ -122,7 +135,7 @@ def run_training():
     with sv.prepare_or_wait_for_session(master) as sess:
 
       # create log writer object (this will log on every machine)
-      summary_writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph())
+      summary_writer = tf.summary.FileWriter(logs_path, sess.graph)
 
       coord = sv.coord
       threads = tf.train.start_queue_runners(sess=sess, coord=coord)
@@ -220,7 +233,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--log_dir',
       type=str,
-      default='/tmp/tensorflow/mnist/logs/fully_connected_feed',
+      default='/tmp/tensorflow/mnist/logs/mnist_reader',
       help='Directory to put the log data.'
   )
 

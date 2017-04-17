@@ -11,5 +11,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License. See accompanying LICENSE file.
 
-BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
-yarn jar $BASE_DIR/lib/tensorflow-yarn-app-0.1.0-SNAPSHOT-jar-with-dependencies.jar $@
+if [ "$1" == "" ] || [ "$1" == "launch" ]  || [ "$1" == "cluster" ]; then
+  BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+  yarn jar $BASE_DIR/lib/tensorflow-yarn-app-0.1.0-SNAPSHOT-jar-with-dependencies.jar $@;
+else
+  yarn $@;
+fi
