@@ -79,12 +79,12 @@ public class LaunchContainerThread extends Thread {
           + ":" + container.getNodeId().getPort()
           + ", containerNodeURI=" + container.getNodeHttpAddress()
           + ", containerResourceMemory="
-          + container.getResource().getMemorySize()
+          + container.getResource().getMemory()
           + ", containerResourceVirtualCores="
           + container.getResource().getVirtualCores()
           + ", command: " + command);
       ContainerLaunchContext ctx = ContainerLaunchContext.newInstance(
-          localResources, env, Lists.newArrayList(command), null, null, null, null);
+          localResources, env, Lists.newArrayList(command), null, null, null);
       appMaster.addContainer(container);
       appMaster.getNMClientAsync().startContainerAsync(container, ctx);
     } catch (Exception e) {

@@ -36,7 +36,7 @@ import org.apache.hadoop.yarn.api.records.FinalApplicationStatus;
 import org.apache.hadoop.yarn.api.records.NodeReport;
 import org.apache.hadoop.yarn.api.records.Priority;
 import org.apache.hadoop.yarn.api.records.Resource;
-import org.apache.hadoop.yarn.api.records.UpdatedContainer;
+// import org.apache.hadoop.yarn.api.records.UpdatedContainer;
 import org.apache.hadoop.yarn.client.api.AMRMClient.ContainerRequest;
 import org.apache.hadoop.yarn.client.api.async.AMRMClientAsync;
 import org.apache.hadoop.yarn.client.api.async.NMClientAsync;
@@ -202,7 +202,7 @@ public class ApplicationMaster extends ProcessRunner {
   }
 
   private RegisterApplicationMasterResponse setupRMConnection(String hostname, int rpcPort) throws Exception {
-    AMRMClientAsync.AbstractCallbackHandler allocListener =
+    RMCallbackHandler allocListener =
         new RMCallbackHandler();
     amRMClient = AMRMClientAsync.createAMRMClientAsync(1000, allocListener);
     amRMClient.init(conf);
@@ -237,7 +237,7 @@ public class ApplicationMaster extends ProcessRunner {
   private void setupContainerResource(RegisterApplicationMasterResponse response) {
     // Dump out information about cluster capability as seen by the
     // resource manager
-    long maxMem = response.getMaximumResourceCapability().getMemorySize();
+    long maxMem = response.getMaximumResourceCapability().getMemory();
     LOG.info("Max mem capability of resources in this cluster " + maxMem);
 
     int maxVCores = response.getMaximumResourceCapability().getVirtualCores();
@@ -315,13 +315,13 @@ public class ApplicationMaster extends ProcessRunner {
   private ContainerRequest setupContainerAskForRM() {
     // Set up resource type requirements
     // For now, memory and CPU are supported so we set memory and cpu requirements
-    Resource capability = Resource.newInstance(containerMemory, containerVCores);
+    Resource capability = Resource.newInstance((int)containerMemory, containerVCores);
     Priority priority = Priority.newInstance(0);
 
     return new ContainerRequest(capability, null, null, priority);
   }
 
-  static class NMCallbackHandler extends NMClientAsync.AbstractCallbackHandler {
+  static class NMCallbackHandler implements NMClientAsync.CallbackHandler {
 
     private final ApplicationMaster applicationMaster;
     private ConcurrentMap<ContainerId, Container> containers =
@@ -335,7 +335,7 @@ public class ApplicationMaster extends ProcessRunner {
       containers.putIfAbsent(containerId, container);
     }
 
-    @Override
+    // @Override
     public void onContainerStopped(ContainerId containerId) {
       if (LOG.isDebugEnabled()) {
         LOG.debug("Succeeded to stop Container " + containerId);
@@ -343,7 +343,7 @@ public class ApplicationMaster extends ProcessRunner {
       containers.remove(containerId);
     }
 
-    @Override
+    // @Override
     public void onContainerStatusReceived(ContainerId containerId,
         ContainerStatus containerStatus) {
       if (LOG.isDebugEnabled()) {
@@ -352,7 +352,7 @@ public class ApplicationMaster extends ProcessRunner {
       }
     }
 
-    @Override
+    // @Override
     public void onContainerStarted(ContainerId containerId,
         Map<String, ByteBuffer> allServiceResponse) {
       if (LOG.isDebugEnabled()) {
@@ -365,12 +365,12 @@ public class ApplicationMaster extends ProcessRunner {
       }
     }
 
-    @Override
-    public void onContainerResourceIncreased(
-        ContainerId containerId, Resource resource) {
-    }
+    // @Override
+    // public void onContainerResourceIncreased(
+    //     ContainerId containerId, Resource resource) {
+    // }
 
-    @Override
+    // @Override
     public void onStartContainerError(ContainerId containerId, Throwable t) {
       LOG.error("Failed to start Container " + containerId);
       containers.remove(containerId);
@@ -378,22 +378,22 @@ public class ApplicationMaster extends ProcessRunner {
       applicationMaster.failedContainerNum.incrementAndGet();
     }
 
-    @Override
+    // @Override
     public void onGetContainerStatusError(
         ContainerId containerId, Throwable t) {
       LOG.error("Failed to query the status of Container " + containerId);
     }
 
-    @Override
+    // @Override
     public void onStopContainerError(ContainerId containerId, Throwable t) {
       LOG.error("Failed to stop Container " + containerId);
       containers.remove(containerId);
     }
 
-    @Override
-    public void onIncreaseContainerResourceError(
-        ContainerId containerId, Throwable t) {
-    }
+    // @Override
+    // public void onIncreaseContainerResourceError(
+    //     ContainerId containerId, Throwable t) {
+    // }
 
   }
 
@@ -405,9 +405,9 @@ public class ApplicationMaster extends ProcessRunner {
     }
   }
 
-  class RMCallbackHandler extends AMRMClientAsync.AbstractCallbackHandler {
-    @SuppressWarnings("unchecked")
-    @Override
+  class RMCallbackHandler implements AMRMClientAsync.CallbackHandler {
+    // @SuppressWarnings("unchecked")
+    // @Override
     public void onContainersCompleted(List<ContainerStatus> completedContainers) {
       LOG.info("Got response from RM for container ask, completedCnt="
           + completedContainers.size());
@@ -471,7 +471,7 @@ public class ApplicationMaster extends ProcessRunner {
       }
     }
 
-    @Override
+    // @Override
     public void onContainersAllocated(List<Container> allocatedContainers) {
       allocatedContainerNum.addAndGet(allocatedContainers.size());
       ApplicationMaster.this.allocatedContainers.addAll(allocatedContainers);
@@ -480,27 +480,27 @@ public class ApplicationMaster extends ProcessRunner {
       }
     }
 
-    @Override
-    public void onContainersUpdated(
-        List<UpdatedContainer> containers) {
-    }
+    // @Override
+    // public void onContainersUpdated(
+    //     List<UpdatedContainer> containers) {
+    // }
 
-    @Override
+    // @Override
     public void onShutdownRequest() {
       done = true;
     }
 
-    @Override
+    // @Override
     public void onNodesUpdated(List<NodeReport> updatedNodes) {
     }
 
-    @Override
+    // @Override
     public float getProgress() {
       // set progress to deliver to RM on next heartbeat
       return (float) completedContainerNum.get() / args.totalContainerNum;
     }
 
-    @Override
+    // @Override
     public void onError(Throwable e) {
       LOG.error("Error in RMCallbackHandler: ", e);
       done = true;
