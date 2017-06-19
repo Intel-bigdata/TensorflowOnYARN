@@ -396,7 +396,7 @@ public class ApplicationMaster extends ProcessRunner {
 
   class RMCallbackHandler implements AMRMClientAsync.CallbackHandler {
     // @SuppressWarnings("unchecked")
-    // @Override
+    @Override
     public void onContainersCompleted(List<ContainerStatus> completedContainers) {
       LOG.info("Got response from RM for container ask, completedCnt="
           + completedContainers.size());
