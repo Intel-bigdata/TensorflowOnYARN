@@ -334,7 +334,6 @@ public class ApplicationMaster extends ProcessRunner {
       containers.putIfAbsent(containerId, container);
     }
 
-    // @Override
     public void onContainerStopped(ContainerId containerId) {
       if (LOG.isDebugEnabled()) {
         LOG.debug("Succeeded to stop Container " + containerId);
@@ -342,7 +341,6 @@ public class ApplicationMaster extends ProcessRunner {
       containers.remove(containerId);
     }
 
-    // @Override
     public void onContainerStatusReceived(ContainerId containerId,
         ContainerStatus containerStatus) {
       if (LOG.isDebugEnabled()) {
@@ -351,7 +349,6 @@ public class ApplicationMaster extends ProcessRunner {
       }
     }
 
-    // @Override
     public void onContainerStarted(ContainerId containerId,
         Map<String, ByteBuffer> allServiceResponse) {
       if (LOG.isDebugEnabled()) {
@@ -364,7 +361,6 @@ public class ApplicationMaster extends ProcessRunner {
       }
     }
 
-    // @Override
     public void onStartContainerError(ContainerId containerId, Throwable t) {
       LOG.error("Failed to start Container " + containerId);
       containers.remove(containerId);
@@ -372,13 +368,11 @@ public class ApplicationMaster extends ProcessRunner {
       applicationMaster.failedContainerNum.incrementAndGet();
     }
 
-    // @Override
     public void onGetContainerStatusError(
         ContainerId containerId, Throwable t) {
       LOG.error("Failed to query the status of Container " + containerId);
     }
 
-    // @Override
     public void onStopContainerError(ContainerId containerId, Throwable t) {
       LOG.error("Failed to stop Container " + containerId);
       containers.remove(containerId);
@@ -395,8 +389,6 @@ public class ApplicationMaster extends ProcessRunner {
   }
 
   class RMCallbackHandler implements AMRMClientAsync.CallbackHandler {
-    // @SuppressWarnings("unchecked")
-    // @Override
     public void onContainersCompleted(List<ContainerStatus> completedContainers) {
       LOG.info("Got response from RM for container ask, completedCnt="
           + completedContainers.size());
@@ -460,7 +452,6 @@ public class ApplicationMaster extends ProcessRunner {
       }
     }
 
-    // @Override
     public void onContainersAllocated(List<Container> allocatedContainers) {
       allocatedContainerNum.addAndGet(allocatedContainers.size());
       ApplicationMaster.this.allocatedContainers.addAll(allocatedContainers);
@@ -469,22 +460,18 @@ public class ApplicationMaster extends ProcessRunner {
       }
     }
 
-    // @Override
     public void onShutdownRequest() {
       done = true;
     }
 
-    // @Override
     public void onNodesUpdated(List<NodeReport> updatedNodes) {
     }
 
-    // @Override
     public float getProgress() {
       // set progress to deliver to RM on next heartbeat
       return (float) completedContainerNum.get() / args.totalContainerNum;
     }
 
-    // @Override
     public void onError(Throwable e) {
       LOG.error("Error in RMCallbackHandler: ", e);
       done = true;
