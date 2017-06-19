@@ -28,6 +28,7 @@ import org.apache.hadoop.yarn.api.records.LocalResourceType;
 import org.apache.hadoop.yarn.api.records.LocalResourceVisibility;
 import org.apache.hadoop.yarn.api.records.URL;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
+import org.apache.hadoop.yarn.util.ConverterUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,7 +75,7 @@ public class Utils {
     FileStatus scFileStatus = fs.getFileStatus(dst);
     LocalResource resource =
         LocalResource.newInstance(
-            URL.fromURI(dst.toUri()),
+            ConverterUtils.getYarnUrlFromURI(dst.toUri()),
             LocalResourceType.FILE, LocalResourceVisibility.APPLICATION,
             scFileStatus.getLen(), scFileStatus.getModificationTime());
     localResources.put(key, resource);

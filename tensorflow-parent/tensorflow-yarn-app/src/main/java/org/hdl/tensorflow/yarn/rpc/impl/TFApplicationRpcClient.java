@@ -43,7 +43,7 @@ public class TFApplicationRpcClient implements TFApplicationRpc {
   private TFApplicationRpcClient(String serverAddress, int serverPort) throws IOException {
     InetSocketAddress address = new InetSocketAddress(serverAddress, serverPort);
     Configuration conf = new Configuration();
-    RetryPolicy retryPolicy = RMProxy.createRetryPolicy(conf, false);
+    RetryPolicy retryPolicy = RMProxy.createRetryPolicy(conf);
     TensorFlowCluster proxy = RMProxy.createRMProxy(conf, TensorFlowCluster.class, address);
     this.tensorflow = (TensorFlowCluster) RetryProxy.create(
         TensorFlowCluster.class, proxy, retryPolicy);
