@@ -75,7 +75,6 @@ public class Utils {
     FileStatus scFileStatus = fs.getFileStatus(dst);
     LocalResource resource =
         LocalResource.newInstance(
-            // URL.fromURI(dst.toUri()),
             ConverterUtils.getYarnUrlFromURI(dst.toUri()),
             LocalResourceType.FILE, LocalResourceVisibility.APPLICATION,
             scFileStatus.getLen(), scFileStatus.getModificationTime());

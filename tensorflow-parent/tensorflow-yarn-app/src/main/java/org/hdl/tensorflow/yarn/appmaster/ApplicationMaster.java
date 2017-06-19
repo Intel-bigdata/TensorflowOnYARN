@@ -36,7 +36,6 @@ import org.apache.hadoop.yarn.api.records.FinalApplicationStatus;
 import org.apache.hadoop.yarn.api.records.NodeReport;
 import org.apache.hadoop.yarn.api.records.Priority;
 import org.apache.hadoop.yarn.api.records.Resource;
-// import org.apache.hadoop.yarn.api.records.UpdatedContainer;
 import org.apache.hadoop.yarn.client.api.AMRMClient.ContainerRequest;
 import org.apache.hadoop.yarn.client.api.async.AMRMClientAsync;
 import org.apache.hadoop.yarn.client.api.async.NMClientAsync;
@@ -366,11 +365,6 @@ public class ApplicationMaster extends ProcessRunner {
     }
 
     // @Override
-    // public void onContainerResourceIncreased(
-    //     ContainerId containerId, Resource resource) {
-    // }
-
-    // @Override
     public void onStartContainerError(ContainerId containerId, Throwable t) {
       LOG.error("Failed to start Container " + containerId);
       containers.remove(containerId);
@@ -389,11 +383,6 @@ public class ApplicationMaster extends ProcessRunner {
       LOG.error("Failed to stop Container " + containerId);
       containers.remove(containerId);
     }
-
-    // @Override
-    // public void onIncreaseContainerResourceError(
-    //     ContainerId containerId, Throwable t) {
-    // }
 
   }
 
@@ -479,11 +468,6 @@ public class ApplicationMaster extends ProcessRunner {
         startAllContainers();
       }
     }
-
-    // @Override
-    // public void onContainersUpdated(
-    //     List<UpdatedContainer> containers) {
-    // }
 
     // @Override
     public void onShutdownRequest() {
